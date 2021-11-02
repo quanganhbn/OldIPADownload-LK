@@ -1,0 +1,52 @@
+# vim: expandtab tabstop=2 shiftwidth=2
+name: OLDIPA_Download
+
+env:
+  appUrl: ${{ github.event.client_payload.appUrl }}
+  appStore: ${{ github.event.client_payload.appStore }}
+  appName: ${{ github.event.client_payload.appName }}
+  appVer: ${{ github.event.client_payload.appVer }}
+  APPLEID: ${{ github.event.client_payload.id }}
+  APPLEID_PWD: ${{ github.event.client_payload.id_pwd }}
+  PYTHONIOENCODING: utf-8
+  
+on: 
+  repository_dispatch:
+    types: [OLDIPA_Download]
+
+jobs:
+  ipa_update:
+    name: 'Starting'
+    runs-on: "windows-latest"
+    steps:
+      - name: Set up git repository
+        uses: actions/checkout@v2
+        
+      - name: Setup iTunes 12.6.5
+        run: |
+            iTunesInstall\install_itunes.bat
+        
+      - name: Login iTunes
+        run: |
+            pip3 install requests
+            pip3 install pywinauto
+            pip3 install frida
+            python3 itunes_auto_login.py %APPLEID% %APPLEID_PWD%
+        shell: cmd
+        
+      - name: Download ipa
+        run: |
+            python3 iTunesDownload\download_ipa.py ${{ env.appStore }} ${{ env.appUrl }} ${{ env.appName }} ${{ env.appVer }}
+            mkdir ${{ runner.temp }}\ipaDown
+            move *.ipa ${{ runner.temp }}\ipaDown
+            move *.sinf ${{ runner.temp }}\ipaDown
+        
+      - name: Pushing to Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: "${{ env.appName }}-${{ env.appVer }}"
+          commit: ${{ github.sha }}
+          tag: "${{ env.appName }}-${{ env.appVer }}"
+          artifacts: ${{ runner.temp }}\ipaDown\${{ env.appName }}.ipa,${{ runner.temp }}\ipaDown\${{ env.appName }}.sinf
+          token: ${{ secrets.GITHUB_TOKEN }}
+        
