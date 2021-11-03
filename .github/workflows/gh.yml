@@ -7,7 +7,7 @@ env:
   appName: ${{ github.event.client_payload.appName }}
   appVer: ${{ github.event.client_payload.appVer }}
   appexVer: ${{ github.event.client_payload.appexVer }}
-  appiid: ${{ github.event.client_payload.id }}
+  appid: ${{ github.event.client_payload.id }}
   appid_pwd: ${{ github.event.client_payload.id_pwd }}
   PYTHONIOENCODING: utf-8
   
