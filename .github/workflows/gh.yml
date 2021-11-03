@@ -39,7 +39,6 @@ jobs:
             python3 iTunesDownload\download_ipa.py ${{ env.appStore }} ${{ env.appUrl }} ${{ env.appName }} ${{ env.appVer }}
             mkdir ${{ runner.temp }}\ipaDown
             move *.ipa ${{ runner.temp }}\ipaDown
-            move *.sinf ${{ runner.temp }}\ipaDown
         
       - name: Pushing to Release
         uses: ncipollo/release-action@v1
@@ -47,6 +46,6 @@ jobs:
           name: "${{ env.appName }}-${{ env.appVer }}"
           commit: ${{ github.sha }}
           tag: "${{ env.appName }}-${{ env.appVer }}"
-          artifacts: ${{ runner.temp }}\ipaDown\${{ env.appName }}.ipa,${{ runner.temp }}\ipaDown\${{ env.appName }}.sinf
+          artifacts: ${{ runner.temp }}\ipaDown\${{ env.appName }}.ipa
           token: ${{ secrets.GITHUB_TOKEN }}
         
