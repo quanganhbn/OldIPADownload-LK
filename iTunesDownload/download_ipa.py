@@ -64,6 +64,7 @@ import re
 import json
 import os
 import base64
+import zipfile
 from get_version import *
 
 session = frida.attach('iTunes.exe')
@@ -149,13 +150,14 @@ def main(args):
     print("Got down url: %s" % (downUrl))
     
     download_file(downUrl, filename + ".ipa")
-    with open('curver.txt', 'w') as f:
-        f.write(appVer)
-    
-    with open(filename + '.sinf', 'wb') as f:
-        f.write(sinf)
-
-
+    with zipfile.ZipFile(filename + '.ipa', 'a') as ipaFile:
+                appContentDir = [c for c in ipaFile.namelist() if c.startswith('Payload/') and len(c.strip('/').split('/')) == 2][0]
+                appContentDir = appContentDir.rstrip('/')
+                scManifestData = ipaFile.read(appContentDir + '/SC_Info/Manifest.plist')
+                scManifest = plistlib.loads(scManifestData)
+                sinfPath = scManifest['SinfPaths'][0]
+                ipaFile.writestr(appContentDir + '/' + sinfPath, sinf)
+                
 if __name__ == '__main__':
     import sys
     sys.exit(main(sys.argv[1:]))
