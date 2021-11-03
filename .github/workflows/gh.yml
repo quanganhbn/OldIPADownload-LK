@@ -6,8 +6,9 @@ env:
   appStore: ${{ github.event.client_payload.appStore }}
   appName: ${{ github.event.client_payload.appName }}
   appVer: ${{ github.event.client_payload.appVer }}
-  APPLEID: ${{ github.event.client_payload.id }}
-  APPLEID_PWD: ${{ github.event.client_payload.id_pwd }}
+  appexVer: ${{ github.event.client_payload.appexVer }}
+  appiid: ${{ github.event.client_payload.id }}
+  appid_pwd: ${{ github.event.client_payload.id_pwd }}
   PYTHONIOENCODING: utf-8
   
 on: 
@@ -31,12 +32,12 @@ jobs:
             pip3 install requests
             pip3 install pywinauto
             pip3 install frida
-            python3 itunes_auto_login.py %APPLEID% %APPLEID_PWD%
+            python3 itunes_auto_login.py %appid% %appid_pwd%
         shell: cmd
         
       - name: Download ipa
         run: |
-            python3 iTunesDownload\download_ipa.py ${{ env.appStore }} ${{ env.appUrl }} ${{ env.appName }} ${{ env.appVer }}
+            python3 iTunesDownload\download_ipa.py ${{ env.appStore }} ${{ env.appUrl }} ${{ env.appName }} ${{ env.appexVer }}
             mkdir ${{ runner.temp }}\ipaDown
             move *.ipa ${{ runner.temp }}\ipaDown
         
